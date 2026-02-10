@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valentine's Memory Lane 💜</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e6e6fa 0%, #d8bfd8 50%, #dda0dd 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 450px;
+            width: 100%;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 35px 25px;
+            box-shadow: 0 20px 60px rgba(138, 43, 226, 0.3);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border: 3px solid #e6e6fa;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            color: #9370db;
+            margin-bottom: 10px;
+            font-size: 26px;
+        }
+
+        h2 {
+            color: #8a6bb4;
+            margin-bottom: 15px;
+            font-size: 22px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .question-box {
+            background: linear-gradient(135deg, #f5f0ff 0%, #ede7f6 100%);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border: 2px solid #e6e6fa;
+        }
+
+        .question-text {
+            font-size: 18px;
+            color: #4a4a4a;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option-btn {
+            background: white;
+            border: 2px solid #dda0dd;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #4a4a4a;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .option-btn:hover {
+            background: #f5f0ff;
+            transform: translateX(5px);
+        }
+
+        .option-btn.correct {
+            background: #dda0dd;
+            color: white;
+            border-color: #9370db;
+        }
+
+        .option-btn.wrong {
+            background: #ffebee;
+            border-color: #ff6b6b;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #f0e6ff;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #9370db, #dda0dd);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .code-block {
+            background: #2d2d2d;
+            color: #dda0dd;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .code-keyword { color: #c792ea; }
+        .code-string { color: #c3e88d; }
+        .code-comment { color: #676e95; }
+
+        .buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        button {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .yes-btn {
+            background: linear-gradient(135deg, #9370db 0%, #dda0dd 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(147, 112, 219, 0.3);
+        }
+
+        .yes-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(147, 112, 219, 0.4);
+        }
+
+        .no-btn {
+            background: #f5f0ff;
+            color: #8a6bb4;
+            border: 2px solid #dda0dd;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            border: 2px solid #ff9800;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            color: #e65100;
+            font-weight: 600;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .kitten-box {
+            margin: 20px 0;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .kitten-box img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .photo-container {
+            position: relative;
+            margin: 20px 0;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(147, 112, 219, 0.3);
+        }
+
+        .photo-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .heart-burst {
+            position: absolute;
+            pointer-events: none;
+        }
+
+        .heart {
+            position: absolute;
+            font-size: 30px;
+            animation: burstOut 2s ease-out forwards;
+            pointer-events: none;
+        }
+
+        @keyframes burstOut {
+            0% {
+                transform: translate(0, 0) scale(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--tx), var(--ty)) scale(1.5) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .sparkle-effect {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            background: radial-gradient(circle, rgba(221,160,221,0.3) 0%, transparent 70%);
+            animation: sparkle 1.5s ease-in-out infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        .error-text {
+            color: #d32f2f;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            margin: 10px 0;
+            padding: 10px;
+            background: #ffebee;
+            border-radius: 5px;
+        }
+
+        .final-message {
+            font-size: 18px;
+            color: #8a6bb4;
+            line-height: 1.6;
+            margin: 20px 0;
+        }
+
+        .emoji-big {
+            font-size: 60px;
+            margin: 15px 0;
+        }
+
+        .loading-bar {
+            width: 100%;
+            height: 6px;
+            background: #f0e6ff;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .loading-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #9370db, #dda0dd);
+            animation: loading 2s ease-in-out infinite;
+        }
+
+        @keyframes loading {
+            0% { width: 0%; }
+            50% { width: 100%; }
+            100% { width: 0%; }
+        }
+
+        .talent-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #e6e6fa, #dda0dd);
+            padding: 8px 16px;
+            border-radius: 20px;
+            margin: 5px;
+            font-size: 13px;
+            color: #4a4a4a;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <!-- Welcome Screen -->
+            <div id="welcomeScreen" class="screen active">
+                <h1>💜 Before We Begin...</h1>
+                <p class="subtitle">Let's take a trip down memory lane!</p>
+                
+                <div class="code-block">
+                    <div><span class="code-comment">// Initializing Valentine's protocol...</span></div>
+                    <div><span class="code-keyword">function</span> <span class="code-string">checkOurMemories</span>() {</div>
+                    <div>&nbsp;&nbsp;<span class="code-keyword">if</span> (remembersEverything == <span class="code-string">true</span>) {</div>
+                    <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> <span class="code-string">"proceed_to_question"</span>;</div>
+                    <div>&nbsp;&nbsp;}</div>
+                    <div>}</div>
+                </div>
+
+                <div class="question-box">
+                    <p style="font-size: 16px; color: #666;">
+                        🎯 Answer a few questions about us to unlock the special surprise!
+                    </p>
+                </div>
+
+                <button class="yes-btn" onclick="startQuiz()" style="width: 100%;">
+                    Let's Begin! ✨
+                </button>
+            </div>
+
+            <!-- Question 1 -->
+            <div id="question1" class="screen">
+                <h2>Question 1 of 3 🍜</h2>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 33%;"></div>
+                </div>
+                
+                <div class="question-box">
+                    <p class="question-text">What's our favorite food to eat together?</p>
+                    <div class="options">
+                        <button class="option-btn" onclick="checkAnswer(1, false, this)">🍕 Pizza</button>
+                        <button class="option-btn" onclick="checkAnswer(1, true, this)">🥟 Momos</button>
+                        <button class="option-btn" onclick="checkAnswer(1, false, this)">🍝 Pasta</button>
+                        <button class="option-btn" onclick="checkAnswer(1, false, this)">🍔 Burgers</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question 2 -->
+            <div id="question2" class="screen">
+                <h2>Question 2 of 3 🌍</h2>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 66%;"></div>
+                </div>
+                
+                <div class="question-box">
+                    <p class="question-text">Where's our favorite place to roam?</p>
+                    <div class="options">
+                        <button class="option-btn" onclick="checkAnswer(2, false, this)">🏖️ Mumbai Beach</button>
+                        <button class="option-btn" onclick="checkAnswer(2, true, this)">🏰 Burhanpur</button>
+                        <button class="option-btn" onclick="checkAnswer(2, false, this)">⛰️ Hill Station</button>
+                        <button class="option-btn" onclick="checkAnswer(2, false, this)">🛍️ Shopping Mall</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question 3 -->
+            <div id="question3" class="screen">
+                <h2>Question 3 of 3 🍦</h2>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 100%;"></div>
+                </div>
+                
+                <div class="question-box">
+                    <p class="question-text">Which ice cream does she love?</p>
+                    <div class="options">
+                        <button class="option-btn" onclick="checkAnswer(3, false, this)">🍫 Chocolate</button>
+                        <button class="option-btn" onclick="checkAnswer(3, false, this)">🍓 Strawberry</button>
+                        <button class="option-btn" onclick="checkAnswer(3, true, this)">🍊 Orange Popsicle</button>
+                        <button class="option-btn" onclick="checkAnswer(3, false, this)">🍦 Vanilla</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Proposal Screen -->
+            <div id="proposalScreen" class="screen">
+                <h1>💜 The Big Question</h1>
+                <p class="subtitle">Query executing...</p>
+                
+                <div class="code-block">
+                    <div><span class="code-comment">-- Valentine's Database Query</span></div>
+                    <div><span class="code-keyword">SELECT</span> * <span class="code-keyword">FROM</span> perfect_matches</div>
+                    <div><span class="code-keyword">WHERE</span> person = <span class="code-string">'you'</span></div>
+                    <div>&nbsp;&nbsp;<span class="code-keyword">AND</span> talents = <span class="code-string">'arts, drawing, creativity'</span></div>
+                    <div>&nbsp;&nbsp;<span class="code-keyword">AND</span> workplace = <span class="code-string">'Toothsi Aligners'</span></div>
+                    <div>&nbsp;&nbsp;<span class="code-keyword">AND</span> smile = <span class="code-string">'perfect'</span>;</div>
+                    <div style="margin-top: 8px; color: #c3e88d;">✓ Result: 1 amazing person found!</div>
+                </div>
+
+                <div style="margin: 20px 0;">
+                    <span class="talent-badge">🎨 Artist</span>
+                    <span class="talent-badge">✏️ Drawing Expert</span>
+                    <span class="talent-badge">📊 Data Analyst</span>
+                    <span class="talent-badge">💻 BSc IT</span>
+                    <span class="talent-badge">😊 Creative Soul</span>
+                </div>
+
+                <p style="font-size: 22px; color: #4a4a4a; margin: 25px 0; font-weight: 600;">
+                    Will you be my Valentine? 💕
+                </p>
+
+                <div class="buttons">
+                    <button class="yes-btn" onclick="handleYes()">
+                        ✓ YES!
+                    </button>
+                    <button class="no-btn" onclick="handleNo()" id="noBtn">
+                        ✗ No
+                    </button>
+                </div>
+            </div>
+
+            <!-- Success Screen -->
+            <div id="successScreen" class="screen">
+                <div class="emoji-big">🎉</div>
+                <h1 style="color: #9370db;">She Said YES! 💜</h1>
+                
+                <div class="photo-container" id="photoContainer">
+                    <img src="couple-photo.jpeg" alt="Us Together" id="couplePhoto">
+                    <div class="sparkle-effect"></div>
+                </div>
+
+                <div class="code-block">
+                    <div><span class="code-comment">// Transaction committed ✓</span></div>
+                    <div><span class="code-keyword">INSERT INTO</span> best_days <span class="code-keyword">VALUES</span></div>
+                    <div>&nbsp;&nbsp;(<span class="code-string">'Valentine\'s 2025'</span>, <span class="code-string">'Forever'</span>);</div>
+                    <div style="margin-top: 8px; color: #c3e88d;">💚 Success: Our story continues...</div>
+                </div>
+
+                <div class="loading-bar">
+                    <div class="loading-progress"></div>
+                </div>
+
+                <p class="final-message">
+                    Can't wait to create more memories with you! 💜✨
+                </p>
+            </div>
+
+            <!-- Rejection Screen -->
+            <div id="rejectionScreen" class="screen">
+                <div class="emoji-big">💔</div>
+                <h1 style="color: #d32f2f;">ERROR 404</h1>
+                <p class="subtitle">Romantic Connection Not Found</p>
+
+                <div class="warning-box" id="warningBox">
+                    ⚠️ WARNING: Continuing rejection may result in data corruption!
+                </div>
+
+                <div id="kittenContainer" class="kitten-box" style="display: none;">
+                    <img id="kittenImage" src="" alt="Sad Kitten">
+                </div>
+
+                <div class="error-text" id="errorText">
+                    ERROR: HEART_BROKEN_EXCEPTION at line 14
+                </div>
+
+                <div class="code-block">
+                    <div><span class="code-comment">-- Debugging rejection...</span></div>
+                    <div><span class="code-keyword">SELECT</span> reason <span class="code-keyword">FROM</span> no_responses;</div>
+                    <div style="margin-top: 8px; color: #ff6b6b;">❌ 0 valid reasons found</div>
+                </div>
+
+                <button class="yes-btn" onclick="backToProposal()" style="width: 100%; margin-top: 20px;">
+                    🔄 Reconsider? (Restore Data)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentQuestion = 0;
+        let noClickCount = 0;
+        
+        const sadKittens = [
+            'https://i.imgur.com/8VyVsWu.jpg',
+            'https://i.imgur.com/5s7KBjD.jpg', 
+            'https://i.imgur.com/qQ7eJrZ.jpg'
+        ];
+
+        const warnings = [
+            '⚠️ WARNING: Your memories might get corrupted!',
+            '🚨 CRITICAL: Database integrity at risk!',
+            '❌ FATAL: All romantic data will be lost!',
+            '💥 SYSTEM FAILURE: Love.exe has stopped working!'
+        ];
+
+        const errors = [
+            'ERROR: HEART_BROKEN_EXCEPTION at line 14',
+            'ERROR: NULL_ROMANCE_POINTER detected',
+            'ERROR: SMILE_MISSING_EXCEPTION thrown',
+            'FATAL: Cannot find happiness.db'
+        ];
+
+        function startQuiz() {
+            showScreen('question1');
+        }
+
+        function checkAnswer(questionNum, isCorrect, button) {
+            if (isCorrect) {
+                button.classList.add('correct');
+                setTimeout(() => {
+                    if (questionNum === 1) showScreen('question2');
+                    else if (questionNum === 2) showScreen('question3');
+                    else if (questionNum === 3) showScreen('proposalScreen');
+                }, 800);
+            } else {
+                button.classList.add('wrong');
+                setTimeout(() => {
+                    button.classList.remove('wrong');
+                }, 500);
+            }
+        }
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function handleYes() {
+            showScreen('successScreen');
+            createHeartBurst();
+            setTimeout(createHeartBurst, 800);
+            setTimeout(createHeartBurst, 1600);
+        }
+
+        function handleNo() {
+            noClickCount++;
+            showScreen('rejectionScreen');
+
+            // Show kitten every 2-3 clicks
+            if (noClickCount % 2 === 0 || noClickCount % 3 === 0) {
+                const kittenContainer = document.getElementById('kittenContainer');
+                const kittenImage = document.getElementById('kittenImage');
+                kittenImage.src = sadKittens[(noClickCount - 1) % sadKittens.length];
+                kittenContainer.style.display = 'block';
+            }
+
+            // Update warning and error messages
+            const warningBox = document.getElementById('warningBox');
+            const errorText = document.getElementById('errorText');
+            warningBox.textContent = warnings[Math.min(noClickCount - 1, warnings.length - 1)];
+            errorText.textContent = errors[Math.min(noClickCount - 1, errors.length - 1)];
+        }
+
+        function backToProposal() {
+            document.getElementById('kittenContainer').style.display = 'none';
+            showScreen('proposalScreen');
+        }
+
+        function createHeartBurst() {
+            const container = document.getElementById('photoContainer');
+            const hearts = ['💜', '💕', '💗', '💖', '💝'];
+            
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.className = 'heart';
+                    heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+                    
+                    const angle = (Math.PI * 2 * i) / 20;
+                    const distance = 150 + Math.random() * 100;
+                    const tx = Math.cos(angle) * distance;
+                    const ty = Math.sin(angle) * distance;
+                    
+                    heart.style.left = '50%';
+                    heart.style.top = '50%';
+                    heart.style.setProperty('--tx', tx + 'px');
+                    heart.style.setProperty('--ty', ty + 'px');
+                    
+                    container.appendChild(heart);
+                    
+                    setTimeout(() => heart.remove(), 2000);
+                }, i * 50);
+            }
+        }
+    </script>
+</body>
+</html>
